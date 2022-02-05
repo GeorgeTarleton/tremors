@@ -13,8 +13,21 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<List<InputData>> futureData;
+
+  @override
+  void initState() {
+    super.initState();
+    futureData = fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,23 +39,23 @@ class MyApp extends StatelessWidget {
           title: const Text('Patient X'),
         ),
         body:
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                      padding: const EdgeInsets.all(100),
-                      child: Graph()
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      MiniInfo(above: "Above1", below: "Below1"),
-                      MiniInfo(above: "Above2", below: "Below2"),
-                    ],
-                  )
-                ],
-              )
-            ),
+        Center(
+            child: Column(
+              children: [
+                Container(
+                    padding: const EdgeInsets.all(100),
+                    child: Graph()
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: const [
+                    MiniInfo(above: "Above1", below: "Below1"),
+                    MiniInfo(above: "Above2", below: "Below2"),
+                  ],
+                )
+              ],
+            )
+        ),
       ),
     );
   }
@@ -101,11 +114,14 @@ class MiniInfo extends StatelessWidget {
 
 }
 
-Future<InputData> fetchData() async {
+Future<List<InputData>> fetchData() async {
   final response = await http.get(Uri.parse("https://localhost:8080/get"));
 
   if (response.statusCode == 200) {
-    return InputData.fromJson(jsonDecode(response.body));
+    final jsonResponse = json.decode(response.body);
+    List listResponse = jsonResponse["data"];
+
+    return listResponse.map((data) => InputData.fromJson(data)).toList();
   } else {
     throw Exception("Failed to load data");
   }

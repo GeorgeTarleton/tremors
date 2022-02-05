@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -96,6 +99,42 @@ class MiniInfo extends StatelessWidget {
     );
   }
 
+}
+
+Future<InputData> fetchData() async {
+  final response = await http.get(Uri.parse("https://localhost:8080/get"));
+
+  if (response.statusCode == 200) {
+    return InputData.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception("Failed to load data");
+  }
+}
+
+class InputData {
+  final int id;
+  final int shakiness;
+  final int concern;
+  final double stddev;
+  final DateTime date;
+
+  const InputData({
+    required this.id,
+    required this.shakiness,
+    required this.concern,
+    required this.stddev,
+    required this.date,
+  });
+
+  factory InputData.fromJson(Map<String, dynamic> json) {
+    return InputData(
+        id: json["id"],
+        shakiness: json["shakiness"],
+        concern: json["concern"],
+        stddev: json["stddev"],
+        date: DateTime.utc(json["year"], json["month"], json["day"]),
+    );
+  }
 }
 
 class TremorData {

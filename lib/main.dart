@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Tremor',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
+          centerTitle: true,
+          title: const Text('Patient X'),
         ),
         body:
             Center(
@@ -26,13 +28,13 @@ class MyApp extends StatelessWidget {
                 children: [
                   Container(
                       padding: const EdgeInsets.all(100),
-                      child: _graph()
+                      child: Graph()
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _miniInfo(),
-                      _miniInfo()
+                    children: const [
+                      MiniInfo(above: "Above1", below: "Below1"),
+                      MiniInfo(above: "Above2", below: "Below2"),
                     ],
                   )
                 ],
@@ -43,47 +45,61 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Widget _graph() {
-  final List<SalesData> chartData = [
-    SalesData(2010, 35),
-    SalesData(2011, 28),
-    SalesData(2012, 34),
-    SalesData(2013, 32),
-    SalesData(2014, 40)
+class Graph extends StatelessWidget {
+  final List<TremorData> chartData = [
+    TremorData(DateTime.utc(2022, 1, 1), 35),
+    TremorData(DateTime.utc(2022, 1, 2), 28),
+    TremorData(DateTime.utc(2022, 1, 3), 34),
+    TremorData(DateTime.utc(2022, 1, 4), 32),
+    TremorData(DateTime.utc(2022, 1, 5), 40),
   ];
 
-  return SfCartesianChart(
-    // primaryXAxis: DateTimeAxis(),
-      series: <ChartSeries>[
-        // Renders line chart
-        LineSeries<SalesData, int>(
-            dataSource: chartData,
-            xValueMapper: (SalesData sales, _) => sales.year,
-            yValueMapper: (SalesData sales, _) => sales.sales
+  @override
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+        primaryXAxis: DateTimeAxis(
+          dateFormat: DateFormat.yMMMd(),
+          intervalType: DateTimeIntervalType.days,
+        ),
+        series: <ChartSeries>[
+          // Renders line chart
+          LineSeries<TremorData, DateTime>(
+              dataSource: chartData,
+              xValueMapper: (TremorData sales, _) => sales.date,
+              yValueMapper: (TremorData sales, _) => sales.concern
+          )
+        ]
+    );
+  }
+}
+
+class MiniInfo extends StatelessWidget {
+  const MiniInfo({required this.above, required this.below});
+  final String above;
+  final String below;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Column(
+          children: [
+            Text(above)
+          ],
+        ),
+        Column(
+          children: [
+            Text(below)
+          ],
         )
-      ]
-  );
+      ],
+    );
+  }
+
 }
 
-Widget _miniInfo() {
-  return Column(
-    children: [
-      Column(
-        children: const [
-          Text("Above")
-        ],
-      ),
-      Column(
-        children: const [
-          Text("Below")
-        ],
-      )
-    ],
-  );
-}
-
-class SalesData {
-  SalesData(this.year, this.sales);
-  final int year;
-  final double sales;
+class TremorData {
+  TremorData(this.date, this.concern);
+  final DateTime date;
+  final double concern;
 }

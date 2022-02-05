@@ -14,36 +14,72 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<SalesData> chartData = [
-      SalesData(2010, 35),
-      SalesData(2011, 28),
-      SalesData(2012, 34),
-      SalesData(2013, 32),
-      SalesData(2014, 40)
-    ];
-
     return MaterialApp(
       title: 'Tremor',
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Welcome to Flutter'),
         ),
-        body: Center(
-          child: SfCartesianChart(
-              // primaryXAxis: DateTimeAxis(),
-              series: <ChartSeries>[
-                // Renders line chart
-                LineSeries<SalesData, int>(
-                    dataSource: chartData,
-                    xValueMapper: (SalesData sales, _) => sales.year,
-                    yValueMapper: (SalesData sales, _) => sales.sales
-                )
-              ]
-          )
-        ),
+        body:
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                      padding: const EdgeInsets.all(100),
+                      child: _graph()
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _miniInfo(),
+                      _miniInfo()
+                    ],
+                  )
+                ],
+              )
+            ),
       ),
     );
   }
+}
+
+Widget _graph() {
+  final List<SalesData> chartData = [
+    SalesData(2010, 35),
+    SalesData(2011, 28),
+    SalesData(2012, 34),
+    SalesData(2013, 32),
+    SalesData(2014, 40)
+  ];
+
+  return SfCartesianChart(
+    // primaryXAxis: DateTimeAxis(),
+      series: <ChartSeries>[
+        // Renders line chart
+        LineSeries<SalesData, int>(
+            dataSource: chartData,
+            xValueMapper: (SalesData sales, _) => sales.year,
+            yValueMapper: (SalesData sales, _) => sales.sales
+        )
+      ]
+  );
+}
+
+Widget _miniInfo() {
+  return Column(
+    children: [
+      Column(
+        children: const [
+          Text("Above")
+        ],
+      ),
+      Column(
+        children: const [
+          Text("Below")
+        ],
+      )
+    ],
+  );
 }
 
 class SalesData {

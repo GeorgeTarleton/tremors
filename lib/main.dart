@@ -16,13 +16,13 @@ void main() {
   runApp(const MyApp());
 }
 
-final List<TremorData> chartData = [
-  TremorData(DateTime.utc(2022, 1, 1), 35),
-  TremorData(DateTime.utc(2022, 1, 2), 28),
-  TremorData(DateTime.utc(2022, 1, 3), 34),
-  TremorData(DateTime.utc(2022, 1, 4), 32),
-  TremorData(DateTime.utc(2022, 1, 5), 40),
-];
+// final List<TremorData> chartData = [
+//   TremorData(DateTime.utc(2022, 1, 1), 35),
+//   TremorData(DateTime.utc(2022, 1, 2), 28),
+//   TremorData(DateTime.utc(2022, 1, 3), 34),
+//   TremorData(DateTime.utc(2022, 1, 4), 32),
+//   TremorData(DateTime.utc(2022, 1, 5), 40),
+// ];
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,9 +43,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var concerns = chartData.map((e) => e.concern).toList();
-    var gradient = getGradient(concerns).toStringAsFixed(2);
-    var latest = concerns[concerns.length-1];
+    // var concerns = chartData.map((e) => e.concern).toList();
+    // var gradient = getGradient(concerns).toStringAsFixed(2);
+    // var latest = concerns[concerns.length-1];
+    var gradient = 1;
+    var latest = 1;
 
     return MaterialApp(
       title: 'TrembleTracker',
@@ -76,7 +78,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                     Container(
                         padding: const EdgeInsets.fromLTRB(80, 40, 80, 80),
-                        child: Graph()
+                        child: Graph(chartData: snapshot.data!.map((e) => TremorData(e.date, e.concern)).toList(),)
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,7 +109,8 @@ double getGradient(List<double> values) {
 }
 
 class Graph extends StatelessWidget {
-
+  const Graph({required this.chartData});
+  final List<TremorData> chartData;
 
   @override
   Widget build(BuildContext context) {
@@ -214,5 +217,5 @@ class InputData {
 class TremorData {
   TremorData(this.date, this.concern);
   final DateTime date;
-  final double concern;
+  final int concern;
 }

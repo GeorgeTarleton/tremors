@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futureData = fetchData();
+    futureData.then((value) => log(value.toString()));
   }
 
   @override
@@ -46,7 +48,7 @@ class _MyAppState extends State<MyApp> {
     var latest = concerns[concerns.length-1];
 
     return MaterialApp(
-      title: 'Tremor',
+      title: 'TrembleTracker',
       home: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -156,9 +158,14 @@ class MiniInfo extends StatelessWidget {
 }
 
 Future<List<InputData>> fetchData() async {
-  final response = await http.get(Uri.parse("https://localhost:8080/get"));
+  final response = await http.get(Uri.parse("http://172.21.121.13:8080"),
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+  });
 
   if (response.statusCode == 200) {
+    // log(response.body.toString());
     final jsonResponse = json.decode(response.body);
     List listResponse = jsonResponse["data"];
 
@@ -185,11 +192,11 @@ class InputData {
 
   factory InputData.fromJson(Map<String, dynamic> json) {
     return InputData(
-        id: json["id"],
-        shakiness: json["shakiness"],
-        concern: json["concern"],
-        stddev: json["stddev"],
-        date: DateTime.utc(json["year"], json["month"], json["day"]),
+        id: json['uid'],
+        shakiness: json['shakiness'],
+        concern: json['concern'],
+        stddev: json['stddev'],
+        date: DateTime.utc(json['year'], json['month'], json['day']),
     );
   }
 }

@@ -62,6 +62,14 @@ class _MyAppState extends State<MyApp> {
                 }
 
                 var gradientColour = Colors.green;
+                var numGradient = double.parse(gradient);
+                if (numGradient < 0) {
+                  gradientColour = Colors.green;
+                } else if (numGradient >= 0 && numGradient < 1) {
+                  gradientColour = Colors.amber;
+                } else {
+                  gradientColour = Colors.red;
+                }
 
                 return Column(
                   children: [

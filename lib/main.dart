@@ -43,11 +43,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // var concerns = chartData.map((e) => e.concern).toList();
-    // var gradient = getGradient(concerns).toStringAsFixed(2);
-    // var latest = concerns[concerns.length-1];
-    var gradient = 1;
-    var latest = 1;
 
     return MaterialApp(
       title: 'TrembleTracker',
@@ -61,6 +56,9 @@ class _MyAppState extends State<MyApp> {
             future: futureData,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                var gradient = getGradient(snapshot.data!.map((e) => e.concern).toList()).toStringAsFixed(2);
+                var latest = snapshot.data![snapshot.data!.length-1].concern;
+
                 return Column(
                   children: [
                     Container(
@@ -84,7 +82,7 @@ class _MyAppState extends State<MyApp> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         MiniInfo(above: "Latest", below: "$latest"),
-                        MiniInfo(above: "Gradient", below: "$gradient"),
+                        MiniInfo(above: "Gradient", below: gradient),
                       ],
                     )
                   ],
@@ -102,7 +100,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-double getGradient(List<double> values) {
+double getGradient(List<int> values) {
   var diff = List.generate(values.length-1, (i) => values[i+1] - values[i]);
 
   return diff.reduce((a,b) => a + b) / diff.length;

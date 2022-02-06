@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"github.com/gocarina/gocsv"
-	"fmt"
+	"github.com/gorilla/mux"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -14,7 +16,7 @@ func main() {
 
 	file, err := os.OpenFile("data.csv", os.O_RDWR | os.O_CREATE, os.ModePerm)
 	if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 	}
 	defer file.Close()
@@ -26,10 +28,11 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(data)
+	log.Println(data)
 
 
-	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+	r := mux.NewRouter()
+	r.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		switch r.Method {
@@ -37,7 +40,7 @@ func main() {
 				body, err := ioutil.ReadAll(r.Body)
 
 				if err != nil {
-					fmt.Printf("Error reading body: %v", err)
+					log.Printf("Error reading body: %v", err)
 					http.Error(w, `{"message": "Couldn't read body."}`, http.StatusBadRequest)
 					return
 				}
@@ -45,14 +48,14 @@ func main() {
 				var x PiDataValue
 				err = json.Unmarshal(body, &x)
 				if err != nil {
-					fmt.Printf("Error parsing body: %v", err)
+					log.Printf("Error parsing body: %v", err)
 					http.Error(w, `{"message": "Couldn't parse body."}`, http.StatusBadRequest)
 					return
 				}
 
 				err = gocsv.MarshalWithoutHeaders([]PiDataValue{x}, file)
 				if err != nil {
-					fmt.Printf("Error marshalling data: %v", err)
+					log.Printf("Error marshalling data: %v", err)
 					http.Error(w, `{"message": "Failed to write data."}`, http.StatusInternalServerError)
 					return
 				}
@@ -64,7 +67,7 @@ func main() {
 			case "GET":
 				d, err := json.Marshal(map[string][]PiDataValue { "data": data })
 				if err != nil {
-					fmt.Printf("Error serialising data: %v", err)
+					log.Printf("Error serialising data: %v", err)
 					http.Error(w, `{"message": "Failed to serialise data."}`, http.StatusInternalServerError)
 					return
 				}
@@ -77,7 +80,40 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":8080", nil)
+	r.HandleFunc("/user/{uid}", func (w http.ResponseWriter, r *http.Request) {
+		pathParams := mux.Vars(r)
+		w.Header().Set("Content-Type", "application/json")
+		
+		uid := -1
+		var err error
+		if val, ok := pathParams["uid"]; ok {
+			uid, err = strconv.Atoi(val)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"message": "need a number"}`))
+        return
+			}
+		}
+
+		matching := []PiDataValue{}
+		for _, pdv := range data {
+			if pdv.Uid == uid {
+				matching = append(matching, pdv)
+			}
+		}
+
+		d, err := json.Marshal(map[string][]PiDataValue { "data": matching })
+		if err != nil {
+			log.Printf("Error serialising data: %v", err)
+			http.Error(w, `{"message": "Failed to serialise data."}`, http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(d)
+	})
+
+	http.ListenAndServe(":8080", r)
 }
 
 type PiDataValue struct {

@@ -4,10 +4,12 @@
 
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:percent_indicator/percent_indicator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,21 +38,34 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text('Patient X'),
+          title: const Text('TrembleTracker'),
         ),
         body:
         Center(
             child: Column(
               children: [
                 Container(
-                    padding: const EdgeInsets.all(100),
+                  margin: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+                  child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: const [
+                        Text("Patient x", style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30
+                        ),),
+                      ],
+                    ),
+                ),
+                Container(
+                    padding: const EdgeInsets.all(80),
                     child: Graph()
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: const [
-                    MiniInfo(above: "Above1", below: "Below1"),
-                    MiniInfo(above: "Above2", below: "Below2"),
+                    MiniInfo(above: "Latest", below: "10"),
+                    MiniInfo(above: "Gradient", below: "10"),
                   ],
                 )
               ],
@@ -100,13 +115,27 @@ class MiniInfo extends StatelessWidget {
       children: [
         Column(
           children: [
-            Text(above)
+            Text(above, style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 40
+            ))
           ],
         ),
-        Column(
-          children: [
-            Text(below)
-          ],
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              CircularPercentIndicator(
+                radius: 70.0,
+                lineWidth: 7.0,
+                percent: 1.0,
+                center: Text(below, style: const TextStyle(
+                  fontSize: 30
+                ),),
+                progressColor: Colors.green,
+              )
+            ],
+          )
         )
       ],
     );

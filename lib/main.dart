@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                 ),
                 Container(
-                    padding: const EdgeInsets.all(80),
+                    padding: const EdgeInsets.fromLTRB(80, 40, 80, 80),
                     child: Graph()
                 ),
                 Row(
@@ -74,6 +74,15 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+int getGradient(List<int> values) {
+  var diff = List.empty();
+  for (var i = 1; i < values.length; i++) {
+    diff.add(values[i] - values[i-1]);
+  }
+
+  return diff.reduce((a,b) => a + b) / diff.length;
 }
 
 class Graph extends StatelessWidget {

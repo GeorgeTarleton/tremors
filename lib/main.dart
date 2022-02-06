@@ -54,36 +54,46 @@ class _MyAppState extends State<MyApp> {
           centerTitle: true,
           title: const Text('TrembleTracker'),
         ),
-        body:
-        Center(
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                  child:
+        body: Center(
+          child: FutureBuilder<List<InputData>>(
+            future: futureData,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+                      child:
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Text("Patient x", style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30
+                          ),),
+                        ],
+                      ),
+                    ),
+                    Container(
+                        padding: const EdgeInsets.fromLTRB(80, 40, 80, 80),
+                        child: Graph()
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Text("Patient x", style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30
-                        ),),
+                      children: [
+                        MiniInfo(above: "Latest", below: "$latest"),
+                        MiniInfo(above: "Gradient", below: "$gradient"),
                       ],
-                    ),
-                ),
-                Container(
-                    padding: const EdgeInsets.fromLTRB(80, 40, 80, 80),
-                    child: Graph()
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    MiniInfo(above: "Latest", below: "$latest"),
-                    MiniInfo(above: "Gradient", below: "$gradient"),
+                    )
                   ],
-                )
-              ],
-            )
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              return const Text("Loading...");
+            },
+          ),
         ),
       ),
     );

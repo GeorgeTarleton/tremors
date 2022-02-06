@@ -52,6 +52,17 @@ class _MyAppState extends State<MyApp> {
                 var latest = snapshot.data![snapshot.data!.length-1].concern;
                 var userId = snapshot.data![0].id;
 
+                var latestColour = Colors.green;
+                if (latest < 4) {
+                  latestColour = Colors.green;
+                } else if (latest >= 4 && latest < 8) {
+                  latestColour = Colors.amber;
+                } else {
+                  latestColour = Colors.red;
+                }
+
+                var gradientColour = Colors.green;
+
                 return Column(
                   children: [
                     Container(
@@ -74,8 +85,8 @@ class _MyAppState extends State<MyApp> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        MiniInfo(above: "Latest Concern", below: "$latest"),
-                        MiniInfo(above: "Gradient", below: gradient),
+                        MiniInfo(above: "Latest Concern", below: "$latest", colour: latestColour),
+                        MiniInfo(above: "Gradient", below: gradient, colour: gradientColour),
                       ],
                     )
                   ],
@@ -123,9 +134,10 @@ class Graph extends StatelessWidget {
 }
 
 class MiniInfo extends StatelessWidget {
-  const MiniInfo({required this.above, required this.below});
+  const MiniInfo({required this.above, required this.below, required this.colour});
   final String above;
   final String below;
+  final Color colour;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +162,7 @@ class MiniInfo extends StatelessWidget {
                 center: Text(below, style: const TextStyle(
                   fontSize: 30
                 ),),
-                progressColor: Colors.green,
+                progressColor: colour,
               )
             ],
           )

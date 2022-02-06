@@ -49,13 +49,17 @@ class _MyAppState extends State<MyApp> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 var gradient = getGradient(snapshot.data!.map((e) => e.concern).toList()).toStringAsFixed(2);
-                var latest = snapshot.data![snapshot.data!.length-1].concern;
+
+                var latest = snapshot.data![snapshot.data!.length-1];
+                var latestConcern = latest.concern;
+                var latestStddev = latest.stddev.toStringAsFixed(2);
+
                 var userId = snapshot.data![0].id;
 
                 var latestColour = Colors.green;
-                if (latest < 4) {
+                if (latestConcern < 4) {
                   latestColour = Colors.green;
-                } else if (latest >= 4 && latest < 8) {
+                } else if (latestConcern >= 4 && latestConcern < 8) {
                   latestColour = Colors.amber;
                 } else {
                   latestColour = Colors.red;
@@ -93,8 +97,9 @@ class _MyAppState extends State<MyApp> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        MiniInfo(above: "Latest Concern", below: "$latest", colour: latestColour),
+                        MiniInfo(above: "Latest Concern", below: "$latestConcern", colour: latestColour),
                         MiniInfo(above: "Gradient", below: gradient, colour: gradientColour),
+                        MiniInfo(above: "Standard Deviation", below: latestStddev, colour: Colors.green),
                       ],
                     )
                   ],
@@ -168,7 +173,7 @@ class MiniInfo extends StatelessWidget {
           child: Column(
             children: [
               CircularPercentIndicator(
-                radius: 90.0,
+                radius: 100.0,
                 lineWidth: 7.0,
                 percent: 1.0,
                 center: Text(below, style: const TextStyle(

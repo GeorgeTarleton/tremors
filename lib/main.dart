@@ -16,14 +16,6 @@ void main() {
   runApp(const MyApp());
 }
 
-// final List<TremorData> chartData = [
-//   TremorData(DateTime.utc(2022, 1, 1), 35),
-//   TremorData(DateTime.utc(2022, 1, 2), 28),
-//   TremorData(DateTime.utc(2022, 1, 3), 34),
-//   TremorData(DateTime.utc(2022, 1, 4), 32),
-//   TremorData(DateTime.utc(2022, 1, 5), 40),
-// ];
-
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -58,6 +50,7 @@ class _MyAppState extends State<MyApp> {
               if (snapshot.hasData) {
                 var gradient = getGradient(snapshot.data!.map((e) => e.concern).toList()).toStringAsFixed(2);
                 var latest = snapshot.data![snapshot.data!.length-1].concern;
+                var userId = snapshot.data![0].id;
 
                 return Column(
                   children: [
@@ -66,8 +59,8 @@ class _MyAppState extends State<MyApp> {
                       child:
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Text("Patient x", style: TextStyle(
+                        children: [
+                          Text("Patient $userId", style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 30
                           ),),
@@ -81,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        MiniInfo(above: "Latest", below: "$latest"),
+                        MiniInfo(above: "Latest Concern", below: "$latest"),
                         MiniInfo(above: "Gradient", below: gradient),
                       ],
                     )
@@ -169,8 +162,9 @@ class MiniInfo extends StatelessWidget {
 }
 
 Future<List<InputData>> fetchData() async {
-  final response = await http.get(Uri.parse("http://172.21.121.13:8080"),
-  headers: {
+  final response = await http.get(Uri.parse("http://172.21.121.13:8080/user/0"),
+  // final response = await http.get(Uri.parse("http://172.21.120.216:8080/user/0"),
+      headers: {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
   });
@@ -179,6 +173,9 @@ Future<List<InputData>> fetchData() async {
     // log(response.body.toString());
     final jsonResponse = json.decode(response.body);
     List listResponse = jsonResponse["data"];
+    for (var l in listResponse) {
+      log(l.toString());
+    }
 
     return listResponse.map((data) => InputData.fromJson(data)).toList();
   } else {

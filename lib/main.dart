@@ -15,6 +15,14 @@ void main() {
   runApp(const MyApp());
 }
 
+final List<TremorData> chartData = [
+  TremorData(DateTime.utc(2022, 1, 1), 35),
+  TremorData(DateTime.utc(2022, 1, 2), 28),
+  TremorData(DateTime.utc(2022, 1, 3), 34),
+  TremorData(DateTime.utc(2022, 1, 4), 32),
+  TremorData(DateTime.utc(2022, 1, 5), 40),
+];
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -33,6 +41,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var concerns = chartData.map((e) => e.concern).toList();
+    var gradient = getGradient(concerns).toStringAsFixed(2);
+    var latest = concerns[concerns.length-1];
+
     return MaterialApp(
       title: 'Tremor',
       home: Scaffold(
@@ -63,9 +75,9 @@ class _MyAppState extends State<MyApp> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const [
-                    MiniInfo(above: "Latest", below: "10"),
-                    MiniInfo(above: "Gradient", below: "10"),
+                  children: [
+                    MiniInfo(above: "Latest", below: "$latest"),
+                    MiniInfo(above: "Gradient", below: "$gradient"),
                   ],
                 )
               ],
@@ -76,23 +88,14 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-int getGradient(List<int> values) {
-  var diff = List.empty();
-  for (var i = 1; i < values.length; i++) {
-    diff.add(values[i] - values[i-1]);
-  }
+double getGradient(List<double> values) {
+  var diff = List.generate(values.length-1, (i) => values[i+1] - values[i]);
 
   return diff.reduce((a,b) => a + b) / diff.length;
 }
 
 class Graph extends StatelessWidget {
-  final List<TremorData> chartData = [
-    TremorData(DateTime.utc(2022, 1, 1), 35),
-    TremorData(DateTime.utc(2022, 1, 2), 28),
-    TremorData(DateTime.utc(2022, 1, 3), 34),
-    TremorData(DateTime.utc(2022, 1, 4), 32),
-    TremorData(DateTime.utc(2022, 1, 5), 40),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +138,7 @@ class MiniInfo extends StatelessWidget {
           child: Column(
             children: [
               CircularPercentIndicator(
-                radius: 70.0,
+                radius: 90.0,
                 lineWidth: 7.0,
                 percent: 1.0,
                 center: Text(below, style: const TextStyle(

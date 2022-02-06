@@ -120,6 +120,10 @@ class Graph extends StatelessWidget {
         primaryXAxis: DateTimeAxis(
           dateFormat: DateFormat.yMMMd(),
           intervalType: DateTimeIntervalType.days,
+          title: AxisTitle(text: "Date"),
+        ),
+        primaryYAxis: NumericAxis(
+          title: AxisTitle(text: "Level of Concern"),
         ),
         series: <ChartSeries>[
           // Renders line chart
